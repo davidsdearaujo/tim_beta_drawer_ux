@@ -3,54 +3,22 @@ import 'dart:math';
 import 'package:custom_drawer/drawer/drawer-widget.dart';
 import 'package:flutter/material.dart';
 
+import '../drawer/drawer-animation-mixin.dart';
+
 class HomeScreen extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen>
-    with SingleTickerProviderStateMixin {
-  AnimationController _controller;
-
-  Animation<double> _drawerRotationAnim;
-  Animation<Offset> _drawerTranslationAnim;
-  Animation<double> _drawerScaleAnim;
-  Animation<Offset> _scaffoldTranslationAnim;
-
+    with DrawerAnimationMixin, SingleTickerProviderStateMixin {
   @override
   void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    _controller = AnimationController(
+    controller = AnimationController(
       vsync: this,
       duration: Duration(seconds: 1),
     );
-
-    _drawerRotationAnim = Tween<double>(
-      begin: 0.3,
-      end: 0,
-    ).animate(_controller);
-
-    _drawerTranslationAnim = Tween<Offset>(
-      begin: Offset(-100, 0),
-      end: Offset(0, 0),
-    ).animate(_controller);
-
-    _drawerScaleAnim = Tween<double>(
-      begin: 0.9,
-      end: 1,
-    ).animate(_controller);
-
-    _scaffoldTranslationAnim = Tween<Offset>(
-      begin: Offset(0, 0),
-      end: Offset(MediaQuery.of(context).size.width * 0.8, 0),
-    ).animate(_controller);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+    super.didChangeDependencies();
   }
 
   @override
@@ -58,20 +26,20 @@ class _HomeScreenState extends State<HomeScreen>
     return Stack(
       children: <Widget>[
         AnimatedBuilder(
-          animation: _controller,
+          animation: controller,
           child: DrawerWidget(),
           builder: (context, child) {
             return Transform(
               transform: Matrix4.identity()
                 ..setEntry(3, 2, 0.001)
-                ..rotateY(-pi * _drawerRotationAnim.value),
+                ..rotateY(-pi * drawerRotationAnim.value),
               child: Transform.scale(
-                scale: _drawerScaleAnim.value,
+                scale: drawerScaleAnim.value,
                 child: Transform.translate(
-                  offset: _drawerTranslationAnim.value,
+                  offset: drawerTranslationAnim.value,
                   child: Transform(
                     transform: Matrix4.rotationY(
-                      pi * _drawerRotationAnim.value,
+                      pi * drawerRotationAnim.value,
                     ),
                     alignment: Alignment.center,
                     child: child,
@@ -82,10 +50,10 @@ class _HomeScreenState extends State<HomeScreen>
           },
         ),
         AnimatedBuilder(
-          animation: _scaffoldTranslationAnim,
+          animation: scaffoldTranslationAnim,
           builder: (context, child) {
             return Transform.translate(
-              offset: _scaffoldTranslationAnim.value,
+              offset: scaffoldTranslationAnim.value,
               child: child,
             );
           },
@@ -100,10 +68,10 @@ class _HomeScreenState extends State<HomeScreen>
                 leading: IconButton(
                   icon: Icon(Icons.menu),
                   onPressed: () {
-                    if (_controller.value == 0)
-                      _controller.forward();
+                    if (controller.value == 0)
+                      controller.forward();
                     else
-                      _controller.reverse();
+                      controller.reverse();
                   },
                 ),
               ),
